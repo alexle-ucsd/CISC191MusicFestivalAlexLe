@@ -89,7 +89,7 @@ public class FestivalGUI extends JFrame {
 
 						JOptionPane.showMessageDialog(this,
 								"Ticket Purchased Successfully!\n" + "Ticket ID: " + ticket.getTicketId() + "\n"
-										+ "Type: " + ticket.getTicketType() + "\n" + "Price: $" + ticket.getPrice());
+										+ "Type: " + ticket.getTicketType() + "\n" + "Price: $" + String.format("%.2f", ticket.getPrice()));
 					}
 
 				} else if (item.equals("View Lineup")) {
