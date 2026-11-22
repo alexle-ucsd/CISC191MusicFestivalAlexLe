@@ -14,6 +14,11 @@ The application features a colorful, neon-themed graphical user interface (GUI) 
 
 This project demonstrates my ability to apply Java programming concepts to a practical software application.
 
+## Application Screenshot
+
+<img width="1026" height="653" alt="Screenshot 2026-11-21 at 11 50 01 PM" src="https://github.com/user-attachments/assets/aa6ec9b2-3b90-41c9-af52-e53dc6bac13a" />
+
+
 ## Main Features
 
 - **Register Attendee:** Register festival attendees and manage their information.
