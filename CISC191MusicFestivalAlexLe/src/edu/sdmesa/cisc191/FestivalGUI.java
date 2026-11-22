@@ -32,17 +32,21 @@ public class FestivalGUI extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 
-		// The dashboard artwork is the exact selected preview, without the fake Mac title bar.
+		// The dashboard artwork is the exact selected preview, without the fake Mac
+		// title bar.
 		// Transparent Swing buttons overlay the six illustrated controls.
 		final java.awt.image.BufferedImage dashboard;
 		try (java.io.InputStream input = FestivalGUI.class.getResourceAsStream("festival_dashboard_background.png")) {
-			if (input == null) throw new java.io.IOException("Missing festival_dashboard_background.png");
+			if (input == null)
+				throw new java.io.IOException("Missing festival_dashboard_background.png");
 			dashboard = javax.imageio.ImageIO.read(input);
 		} catch (java.io.IOException ex) {
-			throw new IllegalStateException("Place festival_dashboard_background.png in the same package as FestivalGUI.java", ex);
+			throw new IllegalStateException(
+					"Place festival_dashboard_background.png in the same package as FestivalGUI.java", ex);
 		}
 		JPanel panel = new JPanel(null) {
-			@Override protected void paintComponent(Graphics g) {
+			@Override
+			protected void paintComponent(Graphics g) {
 				super.paintComponent(g);
 				Graphics2D g2 = (Graphics2D) g.create();
 				g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
@@ -54,10 +58,8 @@ public class FestivalGUI extends JFrame {
 		setContentPane(panel);
 		final java.util.List<JButton> controls = new ArrayList<>();
 		// Positions are in coordinates of the 1536 x 978 artwork.
-		final int[][] bounds = {
-			{60, 626, 465, 122}, {548, 626, 445, 122}, {1010, 626, 465, 122},
-			{60, 774, 465, 126}, {548, 774, 445, 126}, {1010, 774, 465, 126}
-		};
+		final int[][] bounds = { { 60, 626, 465, 122 }, { 548, 626, 445, 122 }, { 1010, 626, 465, 122 },
+				{ 60, 774, 465, 126 }, { 548, 774, 445, 126 }, { 1010, 774, 465, 126 } };
 
 		String[] menuItems = { "Register Attendee", "Buy Ticket", "View Lineup", "View Schedule", "Search Artist",
 				"Exit" };
@@ -90,8 +92,7 @@ public class FestivalGUI extends JFrame {
 							Attendee attendee = new Attendee(nextAttendeeId++, name, email);
 							attendees.add(attendee);
 
-							neonMessage(
-									"Registration Successful!\n" + "Name: " + name + "\n" + "Email: " + email);
+							neonMessage("Registration Successful!\n" + "Name: " + name + "\n" + "Email: " + email);
 						}
 					}
 
@@ -107,10 +108,9 @@ public class FestivalGUI extends JFrame {
 
 						Ticket ticket = new Ticket(nextTicketId++, selectedType, price);
 
-						neonMessage(
-								"Ticket Purchased Successfully!\n" + "Ticket ID: " + ticket.getTicketId() + "\n"
-										+ "Type: " + ticket.getTicketType() + "\n" + "Price: $"
-										+ String.format("%.2f", ticket.getPrice()));
+						neonMessage("Ticket Purchased Successfully!\n" + "Ticket ID: " + ticket.getTicketId() + "\n"
+								+ "Type: " + ticket.getTicketType() + "\n" + "Price: $"
+								+ String.format("%.2f", ticket.getPrice()));
 					}
 
 				} else if (item.equals("View Lineup")) {
@@ -142,9 +142,9 @@ public class FestivalGUI extends JFrame {
 						Artist artist = festival.searchArtist(name.trim());
 
 						if (artist != null) {
-                            showArtistPerformances(artist);
+							showArtistPerformances(artist);
 						} else {
-							neonMessage( "Artist not found: " + name);
+							neonMessage("Artist not found: " + name);
 						}
 					}
 
@@ -198,393 +198,440 @@ public class FestivalGUI extends JFrame {
 			panel.add(button);
 			controls.add(button);
 		}
+
+		// Copyright notice at the bottom of the festival GUI
+		JLabel copyrightLabel = new JLabel(
+				"<html><div style='text-align:center;'>" + "<font color='#FF4DFF'>━━━━━━</font>" + "&nbsp;&nbsp;&nbsp;"
+						+ "<font color='white'>Developed by Alex Le © 2026</font>" + "&nbsp;&nbsp;&nbsp;"
+						+ "<font color='#FF4DFF'>━━━━━━</font>" + "</div></html>");
+
+		copyrightLabel.setForeground(Color.WHITE);
+		copyrightLabel.setFont(new Font("SansSerif", Font.BOLD | Font.ITALIC, 18));
+		copyrightLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+		panel.add(copyrightLabel);
+
+		Runnable layoutCopyright = () -> {
+			copyrightLabel.setBounds(20, (int) (panel.getHeight() * 0.91), panel.getWidth() - 40,
+					(int) (panel.getHeight() * 0.08));
+		};
+
 		Runnable layoutButtons = () -> {
 			for (int i = 0; i < controls.size(); i++) {
 				int[] b = bounds[i];
-				controls.get(i).setBounds(
-					(int) Math.round(b[0] * panel.getWidth() / 1536.0),
-					(int) Math.round(b[1] * panel.getHeight() / 978.0),
-					(int) Math.round(b[2] * panel.getWidth() / 1536.0),
-					(int) Math.round(b[3] * panel.getHeight() / 978.0));
+				controls.get(i).setBounds((int) Math.round(b[0] * panel.getWidth() / 1536.0),
+						(int) Math.round(b[1] * panel.getHeight() / 978.0),
+						(int) Math.round(b[2] * panel.getWidth() / 1536.0),
+						(int) Math.round(b[3] * panel.getHeight() / 978.0));
 			}
 		};
 		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
-			@Override public void componentResized(java.awt.event.ComponentEvent e) { layoutButtons.run(); }
+			@Override
+			public void componentResized(java.awt.event.ComponentEvent e) {
+				layoutButtons.run();
+			}
 		});
 		SwingUtilities.invokeLater(layoutButtons);
 
+		panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+			@Override
+			public void componentResized(java.awt.event.ComponentEvent e) {
+				layoutCopyright.run();
+			}
+		});
+
+		SwingUtilities.invokeLater(layoutCopyright);
+
 	}
 
+	// Consistent neon dialogs, without Swing's default gray JOptionPane appearance.
+	private static final Color NIGHT = new Color(7, 10, 37);
+	private static final Color PANEL_NIGHT = new Color(17, 22, 60);
+	private static final Color CYAN = new Color(0, 224, 255);
+	private static final Color PINK = new Color(255, 54, 194);
 
-    // Consistent neon dialogs, without Swing's default gray JOptionPane appearance.
-    private static final Color NIGHT = new Color(7, 10, 37);
-    private static final Color PANEL_NIGHT = new Color(17, 22, 60);
-    private static final Color CYAN = new Color(0, 224, 255);
-    private static final Color PINK = new Color(255, 54, 194);
+	private JPanel dialogBody(String title) {
+		JPanel body = new JPanel(new BorderLayout(0, 18));
+		body.setBackground(NIGHT);
+		body.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(CYAN, 2),
+				BorderFactory.createEmptyBorder(24, 28, 24, 28)));
+		JLabel heading = new JLabel(title);
+		heading.setFont(new Font("SansSerif", Font.BOLD, 21));
+		heading.setForeground(CYAN);
+		body.add(heading, BorderLayout.NORTH);
+		return body;
+	}
 
-    private JPanel dialogBody(String title) {
-        JPanel body = new JPanel(new BorderLayout(0, 18));
-        body.setBackground(NIGHT);
-        body.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(CYAN, 2),
-            BorderFactory.createEmptyBorder(24, 28, 24, 28)));
-        JLabel heading = new JLabel(title);
-        heading.setFont(new Font("SansSerif", Font.BOLD, 21));
-        heading.setForeground(CYAN);
-        body.add(heading, BorderLayout.NORTH);
-        return body;
-    }
+	private JButton neonButton(String label, boolean primary) {
+		JButton b = new JButton(label);
+		b.setFont(new Font("SansSerif", Font.BOLD, 15));
+		b.setForeground(Color.WHITE);
+		b.setBackground(primary ? new Color(120, 31, 153) : new Color(27, 39, 86));
+		b.setOpaque(true);
+		b.setFocusPainted(false);
+		b.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(primary ? PINK : CYAN, 2, true),
+				BorderFactory.createEmptyBorder(9, 24, 9, 24)));
+		b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return b;
+	}
 
-    private JButton neonButton(String label, boolean primary) {
-        JButton b = new JButton(label);
-        b.setFont(new Font("SansSerif", Font.BOLD, 15));
-        b.setForeground(Color.WHITE);
-        b.setBackground(primary ? new Color(120, 31, 153) : new Color(27, 39, 86));
-        b.setOpaque(true);
-        b.setFocusPainted(false);
-        b.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(primary ? PINK : CYAN, 2, true),
-            BorderFactory.createEmptyBorder(9, 24, 9, 24)));
-        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return b;
-    }
+	private JDialog neonDialog(String title, JPanel body) {
+		JDialog dialog = new JDialog(this, title, true);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setContentPane(body);
+		dialog.pack();
+		dialog.setMinimumSize(new Dimension(420, dialog.getHeight()));
+		dialog.setLocationRelativeTo(this);
+		return dialog;
+	}
 
-    private JDialog neonDialog(String title, JPanel body) {
-        JDialog dialog = new JDialog(this, title, true);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setContentPane(body);
-        dialog.pack();
-        dialog.setMinimumSize(new Dimension(420, dialog.getHeight()));
-        dialog.setLocationRelativeTo(this);
-        return dialog;
-    }
+	private String neonInput(String title, String prompt) {
+		JPanel body = dialogBody(title);
+		JPanel center = new JPanel(new BorderLayout(0, 10));
+		center.setOpaque(false);
+		JLabel label = new JLabel(prompt);
+		label.setForeground(Color.WHITE);
+		label.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		center.add(label, BorderLayout.NORTH);
+		JTextField field = new JTextField(26);
+		field.setFont(new Font("SansSerif", Font.PLAIN, 17));
+		field.setBackground(PANEL_NIGHT);
+		field.setForeground(Color.WHITE);
+		field.setCaretColor(CYAN);
+		field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(CYAN, 2, true),
+				BorderFactory.createEmptyBorder(10, 12, 10, 12)));
+		center.add(field, BorderLayout.CENTER);
+		body.add(center, BorderLayout.CENTER);
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+		actions.setOpaque(false);
+		JButton cancel = neonButton("Cancel", false);
+		JButton submit = neonButton("Continue", true);
+		actions.add(cancel);
+		actions.add(submit);
+		body.add(actions, BorderLayout.SOUTH);
+		JDialog dialog = neonDialog(title, body);
+		final String[] result = { null };
+		cancel.addActionListener(e -> dialog.dispose());
+		submit.addActionListener(e -> {
+			result[0] = field.getText();
+			dialog.dispose();
+		});
+		field.addActionListener(e -> submit.doClick());
+		dialog.getRootPane().setDefaultButton(submit);
+		SwingUtilities.invokeLater(field::requestFocusInWindow);
+		dialog.setVisible(true);
+		return result[0];
+	}
 
-    private String neonInput(String title, String prompt) {
-        JPanel body = dialogBody(title);
-        JPanel center = new JPanel(new BorderLayout(0, 10));
-        center.setOpaque(false);
-        JLabel label = new JLabel(prompt);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        center.add(label, BorderLayout.NORTH);
-        JTextField field = new JTextField(26);
-        field.setFont(new Font("SansSerif", Font.PLAIN, 17));
-        field.setBackground(PANEL_NIGHT);
-        field.setForeground(Color.WHITE);
-        field.setCaretColor(CYAN);
-        field.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(CYAN, 2, true),
-            BorderFactory.createEmptyBorder(10, 12, 10, 12)));
-        center.add(field, BorderLayout.CENTER);
-        body.add(center, BorderLayout.CENTER);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        actions.setOpaque(false);
-        JButton cancel = neonButton("Cancel", false);
-        JButton submit = neonButton("Continue", true);
-        actions.add(cancel); actions.add(submit);
-        body.add(actions, BorderLayout.SOUTH);
-        JDialog dialog = neonDialog(title, body);
-        final String[] result = {null};
-        cancel.addActionListener(e -> dialog.dispose());
-        submit.addActionListener(e -> { result[0] = field.getText(); dialog.dispose(); });
-        field.addActionListener(e -> submit.doClick());
-        dialog.getRootPane().setDefaultButton(submit);
-        SwingUtilities.invokeLater(field::requestFocusInWindow);
-        dialog.setVisible(true);
-        return result[0];
-    }
+	// Custom Swing dropdown avoids the native macOS popup turning black or blank.
+	private String neonSelect(String title, String prompt, String[] choices) {
+		JPanel body = dialogBody(title);
+		JPanel center = new JPanel(new BorderLayout(0, 12));
+		center.setOpaque(false);
+		JLabel label = new JLabel(prompt);
+		label.setForeground(Color.WHITE);
+		label.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		center.add(label, BorderLayout.NORTH);
 
-    // Custom Swing dropdown avoids the native macOS popup turning black or blank.
-    private String neonSelect(String title, String prompt, String[] choices) {
-        JPanel body = dialogBody(title);
-        JPanel center = new JPanel(new BorderLayout(0, 12));
-        center.setOpaque(false);
-        JLabel label = new JLabel(prompt);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        center.add(label, BorderLayout.NORTH);
+		// The selected value remains visible after closing the dropdown.
+		JTextField selected = new JTextField(choices.length > 0 ? choices[0] : "");
+		selected.setEditable(false);
+		selected.setFont(new Font("SansSerif", Font.PLAIN, 17));
+		selected.setBackground(PANEL_NIGHT);
+		selected.setForeground(Color.WHITE);
+		selected.setBorder(BorderFactory.createEmptyBorder(11, 14, 11, 8));
+		JButton arrow = new JButton("\u25be");
+		arrow.setFont(new Font("SansSerif", Font.BOLD, 20));
+		arrow.setForeground(CYAN);
+		arrow.setBackground(PANEL_NIGHT);
+		arrow.setOpaque(true);
+		arrow.setFocusPainted(false);
+		arrow.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 14));
+		arrow.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		JPanel selector = new JPanel(new BorderLayout());
+		selector.setBackground(PANEL_NIGHT);
+		selector.setBorder(BorderFactory.createLineBorder(CYAN, 2, true));
+		selector.add(selected, BorderLayout.CENTER);
+		selector.add(arrow, BorderLayout.EAST);
+		center.add(selector, BorderLayout.CENTER);
+		body.add(center, BorderLayout.CENTER);
 
-        // The selected value remains visible after closing the dropdown.
-        JTextField selected = new JTextField(choices.length > 0 ? choices[0] : "");
-        selected.setEditable(false);
-        selected.setFont(new Font("SansSerif", Font.PLAIN, 17));
-        selected.setBackground(PANEL_NIGHT);
-        selected.setForeground(Color.WHITE);
-        selected.setBorder(BorderFactory.createEmptyBorder(11, 14, 11, 8));
-        JButton arrow = new JButton("\u25be");
-        arrow.setFont(new Font("SansSerif", Font.BOLD, 20));
-        arrow.setForeground(CYAN);
-        arrow.setBackground(PANEL_NIGHT);
-        arrow.setOpaque(true);
-        arrow.setFocusPainted(false);
-        arrow.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 14));
-        arrow.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        JPanel selector = new JPanel(new BorderLayout());
-        selector.setBackground(PANEL_NIGHT);
-        selector.setBorder(BorderFactory.createLineBorder(CYAN, 2, true));
-        selector.add(selected, BorderLayout.CENTER);
-        selector.add(arrow, BorderLayout.EAST);
-        center.add(selector, BorderLayout.CENTER);
-        body.add(center, BorderLayout.CENTER);
+		JList<String> list = new JList<>(choices);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setSelectedIndex(choices.length > 0 ? 0 : -1);
+		list.setFont(new Font("SansSerif", Font.PLAIN, 17));
+		list.setBackground(PANEL_NIGHT);
+		list.setForeground(Color.WHITE);
+		list.setSelectionBackground(new Color(75, 42, 149));
+		list.setSelectionForeground(Color.WHITE);
+		list.setFixedCellHeight(40);
+		list.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+		JPopupMenu popup = new JPopupMenu();
+		popup.setBackground(PANEL_NIGHT);
+		popup.setBorder(BorderFactory.createLineBorder(PINK, 2));
+		JScrollPane popupScroll = new JScrollPane(list);
+		popupScroll.setBorder(null);
+		popupScroll.getViewport().setBackground(PANEL_NIGHT);
+		popupScroll.setPreferredSize(new Dimension(360, Math.min(choices.length * 40 + 8, 220)));
+		popup.add(popupScroll);
+		Runnable showPopup = () -> {
+			popupScroll.setPreferredSize(new Dimension(selector.getWidth(), Math.min(choices.length * 40 + 8, 220)));
+			popup.pack();
+			popup.show(selector, 0, selector.getHeight());
+			list.requestFocusInWindow();
+		};
+		arrow.addActionListener(e -> showPopup.run());
+		selected.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				showPopup.run();
+			}
+		});
+		list.addMouseListener(new java.awt.event.MouseAdapter() {
+			@Override
+			public void mouseClicked(java.awt.event.MouseEvent e) {
+				if (e.getClickCount() >= 1 && list.getSelectedValue() != null) {
+					selected.setText(list.getSelectedValue());
+					popup.setVisible(false);
+				}
+			}
+		});
+		list.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "choose");
+		list.getActionMap().put("choose", new AbstractAction() {
+			@Override
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				if (list.getSelectedValue() != null)
+					selected.setText(list.getSelectedValue());
+				popup.setVisible(false);
+			}
+		});
 
-        JList<String> list = new JList<>(choices);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setSelectedIndex(choices.length > 0 ? 0 : -1);
-        list.setFont(new Font("SansSerif", Font.PLAIN, 17));
-        list.setBackground(PANEL_NIGHT);
-        list.setForeground(Color.WHITE);
-        list.setSelectionBackground(new Color(75, 42, 149));
-        list.setSelectionForeground(Color.WHITE);
-        list.setFixedCellHeight(40);
-        list.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        JPopupMenu popup = new JPopupMenu();
-        popup.setBackground(PANEL_NIGHT);
-        popup.setBorder(BorderFactory.createLineBorder(PINK, 2));
-        JScrollPane popupScroll = new JScrollPane(list);
-        popupScroll.setBorder(null);
-        popupScroll.getViewport().setBackground(PANEL_NIGHT);
-        popupScroll.setPreferredSize(new Dimension(360, Math.min(choices.length * 40 + 8, 220)));
-        popup.add(popupScroll);
-        Runnable showPopup = () -> {
-            popupScroll.setPreferredSize(new Dimension(selector.getWidth(),
-                Math.min(choices.length * 40 + 8, 220)));
-            popup.pack();
-            popup.show(selector, 0, selector.getHeight());
-            list.requestFocusInWindow();
-        };
-        arrow.addActionListener(e -> showPopup.run());
-        selected.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override public void mouseClicked(java.awt.event.MouseEvent e) { showPopup.run(); }
-        });
-        list.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() >= 1 && list.getSelectedValue() != null) {
-                    selected.setText(list.getSelectedValue());
-                    popup.setVisible(false);
-                }
-            }
-        });
-        list.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "choose");
-        list.getActionMap().put("choose", new AbstractAction() {
-            @Override public void actionPerformed(java.awt.event.ActionEvent e) {
-                if (list.getSelectedValue() != null) selected.setText(list.getSelectedValue());
-                popup.setVisible(false);
-            }
-        });
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+		actions.setOpaque(false);
+		JButton cancel = neonButton("Cancel", false);
+		JButton submit = neonButton("Select", true);
+		actions.add(cancel);
+		actions.add(submit);
+		body.add(actions, BorderLayout.SOUTH);
+		JDialog dialog = neonDialog(title, body);
+		final String[] result = { null };
+		cancel.addActionListener(e -> dialog.dispose());
+		submit.addActionListener(e -> {
+			result[0] = selected.getText().isEmpty() ? null : selected.getText();
+			dialog.dispose();
+		});
+		dialog.getRootPane().setDefaultButton(submit);
+		dialog.setVisible(true);
+		return result[0];
+	}
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        actions.setOpaque(false);
-        JButton cancel = neonButton("Cancel", false);
-        JButton submit = neonButton("Select", true);
-        actions.add(cancel);
-        actions.add(submit);
-        body.add(actions, BorderLayout.SOUTH);
-        JDialog dialog = neonDialog(title, body);
-        final String[] result = {null};
-        cancel.addActionListener(e -> dialog.dispose());
-        submit.addActionListener(e -> {
-            result[0] = selected.getText().isEmpty() ? null : selected.getText();
-            dialog.dispose();
-        });
-        dialog.getRootPane().setDefaultButton(submit);
-        dialog.setVisible(true);
-        return result[0];
-    }
+	// Artist card styled to match the approved compact neon reference.
+	// Set times are taken from the same schedule displayed by View Schedule.
+	private void showArtistPerformances(Artist artist) {
+		JPanel body = new JPanel(new BorderLayout(0, 16));
+		body.setBackground(NIGHT);
+		body.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(CYAN, 2, true),
+				BorderFactory.createEmptyBorder(18, 24, 16, 24)));
 
-    // Artist card styled to match the approved compact neon reference.
-    // Set times are taken from the same schedule displayed by View Schedule.
-    private void showArtistPerformances(Artist artist) {
-        JPanel body = new JPanel(new BorderLayout(0, 16));
-        body.setBackground(NIGHT);
-        body.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(CYAN, 2, true),
-            BorderFactory.createEmptyBorder(18, 24, 16, 24)));
+		JLabel heading = new JLabel("ARTIST FOUND!");
+		heading.setForeground(CYAN);
+		heading.setFont(new Font("SansSerif", Font.BOLD, 23));
+		body.add(heading, BorderLayout.NORTH);
 
-        JLabel heading = new JLabel("ARTIST FOUND!");
-        heading.setForeground(CYAN);
-        heading.setFont(new Font("SansSerif", Font.BOLD, 23));
-        body.add(heading, BorderLayout.NORTH);
+		JPanel content = new JPanel();
+		content.setOpaque(false);
+		content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        JPanel content = new JPanel();
-        content.setOpaque(false);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+		JPanel artistRow = new JPanel(new BorderLayout(14, 0));
+		artistRow.setOpaque(false);
+		JLabel headphones = new JLabel(new FestivalDetailIcon("headphones", PINK));
+		artistRow.add(headphones, BorderLayout.WEST);
+		JPanel artistText = new JPanel();
+		artistText.setOpaque(false);
+		artistText.setLayout(new BoxLayout(artistText, BoxLayout.Y_AXIS));
+		JLabel artistName = new JLabel(artist.getName());
+		artistName.setForeground(Color.WHITE);
+		artistName.setFont(new Font("SansSerif", Font.BOLD, 21));
+		artistText.add(artistName);
+		JLabel subtitle = new JLabel("Electronic Music Festival");
+		subtitle.setForeground(new Color(205, 213, 233));
+		subtitle.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		artistText.add(subtitle);
+		artistRow.add(artistText, BorderLayout.CENTER);
+		artistRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+		content.add(Box.createVerticalStrut(5));
+		content.add(artistRow);
+		content.add(Box.createVerticalStrut(15));
 
-        JPanel artistRow = new JPanel(new BorderLayout(14, 0));
-        artistRow.setOpaque(false);
-        JLabel headphones = new JLabel(new FestivalDetailIcon("headphones", PINK));
-        artistRow.add(headphones, BorderLayout.WEST);
-        JPanel artistText = new JPanel();
-        artistText.setOpaque(false);
-        artistText.setLayout(new BoxLayout(artistText, BoxLayout.Y_AXIS));
-        JLabel artistName = new JLabel(artist.getName());
-        artistName.setForeground(Color.WHITE);
-        artistName.setFont(new Font("SansSerif", Font.BOLD, 21));
-        artistText.add(artistName);
-        JLabel subtitle = new JLabel("Electronic Music Festival");
-        subtitle.setForeground(new Color(205, 213, 233));
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        artistText.add(subtitle);
-        artistRow.add(artistText, BorderLayout.CENTER);
-        artistRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-        content.add(Box.createVerticalStrut(5));
-        content.add(artistRow);
-        content.add(Box.createVerticalStrut(15));
+		JSeparator divider = new JSeparator();
+		divider.setForeground(new Color(110, 111, 242));
+		divider.setBackground(new Color(110, 111, 242));
+		divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
+		divider.setAlignmentX(Component.LEFT_ALIGNMENT);
+		content.add(divider);
+		content.add(Box.createVerticalStrut(15));
 
-        JSeparator divider = new JSeparator();
-        divider.setForeground(new Color(110, 111, 242));
-        divider.setBackground(new Color(110, 111, 242));
-        divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 2));
-        divider.setAlignmentX(Component.LEFT_ALIGNMENT);
-        content.add(divider);
-        content.add(Box.createVerticalStrut(15));
+		int matches = 0;
+		for (String day : festivalDays) {
+			for (ScheduleEntry entry : schedule) {
+				if (entry.day.equals(day) && entry.dj.equalsIgnoreCase(artist.getName())) {
+					if (matches++ > 0)
+						content.add(Box.createVerticalStrut(15));
+					String date = day.equals("Friday") ? "May 15, 2026"
+							: day.equals("Saturday") ? "May 16, 2026" : "May 17, 2026";
+					content.add(artistDetailRow("calendar", CYAN, "Day: " + day + ", " + date, true));
+					content.add(Box.createVerticalStrut(8));
+					content.add(artistDetailRow("pin", PINK, "Stage: " + entry.stage, false));
+					content.add(Box.createVerticalStrut(8));
+					content.add(artistDetailRow("clock", new Color(255, 216, 0),
+							"Set Time: " + formatTime(entry.startMinute) + " – " + formatTime(entry.endMinute), false));
+				}
+			}
+		}
+		if (matches == 0) {
+			JLabel missing = new JLabel("Performance time not listed in the schedule.");
+			missing.setForeground(Color.WHITE);
+			missing.setFont(new Font("SansSerif", Font.PLAIN, 16));
+			content.add(missing);
+		}
 
-        int matches = 0;
-        for (String day : festivalDays) {
-            for (ScheduleEntry entry : schedule) {
-                if (entry.day.equals(day) && entry.dj.equalsIgnoreCase(artist.getName())) {
-                    if (matches++ > 0) content.add(Box.createVerticalStrut(15));
-                    String date = day.equals("Friday") ? "May 15, 2026"
-                        : day.equals("Saturday") ? "May 16, 2026" : "May 17, 2026";
-                    content.add(artistDetailRow("calendar", CYAN, "Day: " + day + ", " + date, true));
-                    content.add(Box.createVerticalStrut(8));
-                    content.add(artistDetailRow("pin", PINK, "Stage: " + entry.stage, false));
-                    content.add(Box.createVerticalStrut(8));
-                    content.add(artistDetailRow("clock", new Color(255, 216, 0),
-                        "Set Time: " + formatTime(entry.startMinute) + " – "
-                            + formatTime(entry.endMinute), false));
-                }
-            }
-        }
-        if (matches == 0) {
-            JLabel missing = new JLabel("Performance time not listed in the schedule.");
-            missing.setForeground(Color.WHITE);
-            missing.setFont(new Font("SansSerif", Font.PLAIN, 16));
-            content.add(missing);
-        }
+		JScrollPane scroll = new JScrollPane(content);
+		scroll.setBorder(null);
+		scroll.setOpaque(false);
+		scroll.getViewport().setOpaque(false);
+		scroll.getVerticalScrollBar().setUnitIncrement(14);
+		scroll.setPreferredSize(new Dimension(540, Math.min(370, 104 + Math.max(1, matches) * 110)));
+		body.add(scroll, BorderLayout.CENTER);
 
-        JScrollPane scroll = new JScrollPane(content);
-        scroll.setBorder(null);
-        scroll.setOpaque(false);
-        scroll.getViewport().setOpaque(false);
-        scroll.getVerticalScrollBar().setUnitIncrement(14);
-        scroll.setPreferredSize(new Dimension(540, Math.min(370, 104 + Math.max(1, matches) * 110)));
-        body.add(scroll, BorderLayout.CENTER);
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		actions.setOpaque(false);
+		JButton ok = neonButton("OK", true);
+		actions.add(ok);
+		body.add(actions, BorderLayout.SOUTH);
+		JDialog dialog = neonDialog("Artist Found", body);
+		ok.addActionListener(e -> dialog.dispose());
+		dialog.getRootPane().setDefaultButton(ok);
+		dialog.setVisible(true);
+	}
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        actions.setOpaque(false);
-        JButton ok = neonButton("OK", true);
-        actions.add(ok);
-        body.add(actions, BorderLayout.SOUTH);
-        JDialog dialog = neonDialog("Artist Found", body);
-        ok.addActionListener(e -> dialog.dispose());
-        dialog.getRootPane().setDefaultButton(ok);
-        dialog.setVisible(true);
-    }
+	private JPanel artistDetailRow(String iconType, Color iconColor, String value, boolean bold) {
+		JPanel row = new JPanel(new BorderLayout(13, 0));
+		row.setOpaque(false);
+		row.setAlignmentX(Component.LEFT_ALIGNMENT);
+		JLabel icon = new JLabel(new FestivalDetailIcon(iconType, iconColor));
+		row.add(icon, BorderLayout.WEST);
+		JLabel text = new JLabel(value);
+		text.setForeground(Color.WHITE);
+		text.setFont(new Font("SansSerif", bold ? Font.BOLD : Font.PLAIN, 16));
+		row.add(text, BorderLayout.CENTER);
+		row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+		return row;
+	}
 
-    private JPanel artistDetailRow(String iconType, Color iconColor, String value, boolean bold) {
-        JPanel row = new JPanel(new BorderLayout(13, 0));
-        row.setOpaque(false);
-        row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel icon = new JLabel(new FestivalDetailIcon(iconType, iconColor));
-        row.add(icon, BorderLayout.WEST);
-        JLabel text = new JLabel(value);
-        text.setForeground(Color.WHITE);
-        text.setFont(new Font("SansSerif", bold ? Font.BOLD : Font.PLAIN, 16));
-        row.add(text, BorderLayout.CENTER);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-        return row;
-    }
+	// Draw the neon icons directly, so they look consistent on macOS and Windows.
+	private static class FestivalDetailIcon implements Icon {
+		private final String type;
+		private final Color color;
 
-    // Draw the neon icons directly, so they look consistent on macOS and Windows.
-    private static class FestivalDetailIcon implements Icon {
-        private final String type;
-        private final Color color;
-        FestivalDetailIcon(String type, Color color) { this.type = type; this.color = color; }
-        @Override public int getIconWidth() { return 27; }
-        @Override public int getIconHeight() { return 27; }
-        @Override public void paintIcon(Component c, Graphics g, int x, int y) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.translate(x + 2, y + 2);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(color);
-            g2.setStroke(new BasicStroke(2.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            if ("headphones".equals(type)) {
-                g2.drawArc(2, 2, 19, 19, 0, 180);
-                g2.drawRoundRect(1, 12, 5, 9, 2, 2);
-                g2.drawRoundRect(17, 12, 5, 9, 2, 2);
-            } else if ("calendar".equals(type)) {
-                g2.drawRoundRect(2, 4, 20, 18, 2, 2);
-                g2.drawLine(2, 10, 22, 10);
-                g2.drawLine(7, 1, 7, 7);
-                g2.drawLine(17, 1, 17, 7);
-                g2.fillRect(7, 13, 3, 3);
-                g2.fillRect(14, 13, 3, 3);
-                g2.fillRect(7, 18, 3, 2);
-            } else if ("pin".equals(type)) {
-                java.awt.geom.Path2D path = new java.awt.geom.Path2D.Double();
-                path.moveTo(12, 23);
-                path.curveTo(8, 18, 3, 14, 3, 10);
-                path.curveTo(3, -1, 21, -1, 21, 10);
-                path.curveTo(21, 14, 16, 19, 12, 23);
-                g2.draw(path);
-                g2.drawOval(9, 7, 6, 6);
-            } else if ("clock".equals(type)) {
-                g2.drawOval(2, 2, 20, 20);
-                g2.drawLine(12, 6, 12, 12);
-                g2.drawLine(12, 12, 8, 16);
-            }
-            g2.dispose();
-        }
-    }
+		FestivalDetailIcon(String type, Color color) {
+			this.type = type;
+			this.color = color;
+		}
 
-    private void neonMessage(String message) {
-        JPanel body = dialogBody("FESTIVAL NOTIFICATION");
-        JTextArea text = new JTextArea(message);
-        text.setEditable(false);
-        text.setOpaque(false);
-        text.setForeground(Color.WHITE);
-        text.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        text.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
-        body.add(text, BorderLayout.CENTER);
-        JButton ok = neonButton("OK", true);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setOpaque(false); actions.add(ok);
-        body.add(actions, BorderLayout.SOUTH);
-        JDialog dialog = neonDialog("Festival Notification", body);
-        ok.addActionListener(e -> dialog.dispose());
-        dialog.getRootPane().setDefaultButton(ok);
-        dialog.setVisible(true);
-    }
+		@Override
+		public int getIconWidth() {
+			return 27;
+		}
 
-    private void neonDisplay(String title, JScrollPane scrollPane) {
-        JPanel body = dialogBody(title);
-        scrollPane.setBorder(BorderFactory.createLineBorder(CYAN, 2));
-        scrollPane.getViewport().setBackground(PANEL_NIGHT);
-        Component view = scrollPane.getViewport().getView();
-        if (view instanceof JTextArea) {
-            JTextArea area = (JTextArea) view;
-            area.setBackground(PANEL_NIGHT);
-            area.setForeground(Color.WHITE);
-            area.setCaretColor(CYAN);
-            area.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
-        }
-        body.add(scrollPane, BorderLayout.CENTER);
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setOpaque(false);
-        JButton close = neonButton("Close", true);
-        actions.add(close);
-        body.add(actions, BorderLayout.SOUTH);
-        JDialog dialog = neonDialog(title, body);
-        close.addActionListener(e -> dialog.dispose());
-        dialog.setVisible(true);
-    }
+		@Override
+		public int getIconHeight() {
+			return 27;
+		}
+
+		@Override
+		public void paintIcon(Component c, Graphics g, int x, int y) {
+			Graphics2D g2 = (Graphics2D) g.create();
+			g2.translate(x + 2, y + 2);
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2.setColor(color);
+			g2.setStroke(new BasicStroke(2.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+			if ("headphones".equals(type)) {
+				g2.drawArc(2, 2, 19, 19, 0, 180);
+				g2.drawRoundRect(1, 12, 5, 9, 2, 2);
+				g2.drawRoundRect(17, 12, 5, 9, 2, 2);
+			} else if ("calendar".equals(type)) {
+				g2.drawRoundRect(2, 4, 20, 18, 2, 2);
+				g2.drawLine(2, 10, 22, 10);
+				g2.drawLine(7, 1, 7, 7);
+				g2.drawLine(17, 1, 17, 7);
+				g2.fillRect(7, 13, 3, 3);
+				g2.fillRect(14, 13, 3, 3);
+				g2.fillRect(7, 18, 3, 2);
+			} else if ("pin".equals(type)) {
+				java.awt.geom.Path2D path = new java.awt.geom.Path2D.Double();
+				path.moveTo(12, 23);
+				path.curveTo(8, 18, 3, 14, 3, 10);
+				path.curveTo(3, -1, 21, -1, 21, 10);
+				path.curveTo(21, 14, 16, 19, 12, 23);
+				g2.draw(path);
+				g2.drawOval(9, 7, 6, 6);
+			} else if ("clock".equals(type)) {
+				g2.drawOval(2, 2, 20, 20);
+				g2.drawLine(12, 6, 12, 12);
+				g2.drawLine(12, 12, 8, 16);
+			}
+			g2.dispose();
+		}
+	}
+
+	private void neonMessage(String message) {
+		JPanel body = dialogBody("FESTIVAL NOTIFICATION");
+		JTextArea text = new JTextArea(message);
+		text.setEditable(false);
+		text.setOpaque(false);
+		text.setForeground(Color.WHITE);
+		text.setFont(new Font("SansSerif", Font.PLAIN, 16));
+		text.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+		body.add(text, BorderLayout.CENTER);
+		JButton ok = neonButton("OK", true);
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		actions.setOpaque(false);
+		actions.add(ok);
+		body.add(actions, BorderLayout.SOUTH);
+		JDialog dialog = neonDialog("Festival Notification", body);
+		ok.addActionListener(e -> dialog.dispose());
+		dialog.getRootPane().setDefaultButton(ok);
+		dialog.setVisible(true);
+	}
+
+	private void neonDisplay(String title, JScrollPane scrollPane) {
+		JPanel body = dialogBody(title);
+		scrollPane.setBorder(BorderFactory.createLineBorder(CYAN, 2));
+		scrollPane.getViewport().setBackground(PANEL_NIGHT);
+		Component view = scrollPane.getViewport().getView();
+		if (view instanceof JTextArea) {
+			JTextArea area = (JTextArea) view;
+			area.setBackground(PANEL_NIGHT);
+			area.setForeground(Color.WHITE);
+			area.setCaretColor(CYAN);
+			area.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+		}
+		body.add(scrollPane, BorderLayout.CENTER);
+		JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		actions.setOpaque(false);
+		JButton close = neonButton("Close", true);
+		actions.add(close);
+		body.add(actions, BorderLayout.SOUTH);
+		JDialog dialog = neonDialog(title, body);
+		close.addActionListener(e -> dialog.dispose());
+		dialog.setVisible(true);
+	}
 
 	private void loadTopDJs() {
 		java.util.Set<String> names = new java.util.LinkedHashSet<>();
 
 		for (ScheduleEntry entry : schedule) {
-			if (!entry.dj.contains("CEREMONY") && !entry.dj.contains("FIREWORKS")
-					&& !entry.dj.contains("INTERMEZZO")) {
+			if (!entry.dj.contains("CEREMONY") && !entry.dj.contains("FIREWORKS") && !entry.dj.contains("INTERMEZZO")) {
 				names.add(entry.dj);
 			}
 		}
@@ -597,25 +644,10 @@ public class FestivalGUI extends JFrame {
 		}
 	}
 
-	private final String[] stageNames = {
-		"House Pineapple",
-		"Techno Vault",
-		"Remote Box",
-		"Bass Reactor",
-		"Trance Horizon",
-		"Afterdark Arena",
-		"Electric Paradise",
-		"Cyber Galaxy",
-		"Rhythm Factory",
-		"Solar Frequency",
-		"Digital Dreams",
-		"Underground Empire",
-		"Skyline Beats",
-		"Infinity Sound",
-		"Midnight Odyssey",
-		"Neon Universe",
-		"Eagle Fly",
-	};
+	private final String[] stageNames = { "House Pineapple", "Techno Vault", "Remote Box", "Bass Reactor",
+			"Trance Horizon", "Afterdark Arena", "Electric Paradise", "Cyber Galaxy", "Rhythm Factory",
+			"Solar Frequency", "Digital Dreams", "Underground Empire", "Skyline Beats", "Infinity Sound",
+			"Midnight Odyssey", "Neon Universe", "Eagle Fly", };
 
 	private final String[] festivalDays = { "Friday", "Saturday", "Sunday" };
 
@@ -839,7 +871,8 @@ public class FestivalGUI extends JFrame {
 		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "Delta Heavy", 1410, 1470));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "Getter", 1470, 1530));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "Eptic B2B SPACE LACES", 1530, 1590));
-		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "Doctor P B3B Flux Pavilion B3B FUNTCASE", 1590, 1650));
+		schedule.add(
+				new ScheduleEntry("Saturday", stageNames[4], "Doctor P B3B Flux Pavilion B3B FUNTCASE", 1590, 1650));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "HOL!", 1650, 1710));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[4], "Mary Droppinz", 1710, 1770));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "CUTDWN", 1140, 1230));
@@ -847,7 +880,8 @@ public class FestivalGUI extends JFrame {
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "The Saints", 1290, 1350));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Rob Gee B2B Lenny Dee", 1350, 1410));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Lady Faith B2B LNY TNZ", 1410, 1470));
-		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Audiofreq B3B Code Black B3B Toneshifterz", 1470, 1530));
+		schedule.add(
+				new ScheduleEntry("Saturday", stageNames[5], "Audiofreq B3B Code Black B3B Toneshifterz", 1470, 1530));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Da Tweekaz", 1530, 1590));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Lil Texas", 1590, 1650));
 		schedule.add(new ScheduleEntry("Saturday", stageNames[5], "Mish", 1650, 1710));
@@ -1085,7 +1119,6 @@ public class FestivalGUI extends JFrame {
 		schedule.add(new ScheduleEntry("Sunday", stageNames[16], "Valentina Soto", 1500, 1590));
 		schedule.add(new ScheduleEntry("Sunday", stageNames[16], "MTK", 1590, 1680));
 	}
-
 
 	private String formatTime(int totalMinutes) {
 		int hour24 = (totalMinutes / 60) % 24;
