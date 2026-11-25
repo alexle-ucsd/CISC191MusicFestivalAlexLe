@@ -9,6 +9,12 @@ import java.util.Random;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
 public class FestivalGUI extends JFrame {
 
 	private List<Attendee> attendees = new ArrayList<>();
@@ -19,11 +25,15 @@ public class FestivalGUI extends JFrame {
 	private int nextAttendeeId = 1;
 	private int nextTicketId = 1;
 
+	private static final String ATTENDEE_FILE = "attendees.txt";
+
 	public FestivalGUI() {
 
 		generateFestivalSchedule();
 
 		loadTopDJs();
+
+		loadAttendees();
 
 		setTitle("Electronic Music Festival Management System");
 
@@ -89,8 +99,16 @@ public class FestivalGUI extends JFrame {
 
 						if (email != null && !email.trim().isEmpty()) {
 
-							Attendee attendee = new Attendee(nextAttendeeId++, name, email);
+							int id = nextAttendeeId;
+
+							if (!saveAttendees(id, name, email)) {
+								neonMessage("Unable to save registration.");
+								return;
+							}
+
+							Attendee attendee = new Attendee(id, name, email);
 							attendees.add(attendee);
+							nextAttendeeId++;
 
 							neonMessage("Registration Successful!\n" + "Name: " + name + "\n" + "Email: " + email);
 						}
@@ -1132,6 +1150,78 @@ public class FestivalGUI extends JFrame {
 		String amPm = hour24 < 12 ? "AM" : "PM";
 
 		return String.format("%d:%02d %s", hour12, minute, amPm);
+	}
+
+
+	// LO8: Write attendee information to a text file.
+	private boolean saveAttendees(int id, String name, String email) {
+
+	    if (name.contains("\t") || email.contains("\t")
+	            || name.contains("\n") || email.contains("\n")
+	            || name.contains("\r") || email.contains("\r")) {
+	        return false;
+	    }
+
+	    try (PrintWriter writer = new PrintWriter(
+	            new FileWriter(ATTENDEE_FILE, true))) {
+
+	        writer.println(id + "\t" + name + "\t" + email);
+
+	        return !writer.checkError();
+
+	    } catch (IOException e) {
+
+	        System.out.println("Error saving attendees: "
+	                + e.getMessage());
+
+	        return false;
+	    }
+	}
+
+	// LO8: Read attendee information from a text file.
+	private void loadAttendees() {
+
+	    File file = new File(ATTENDEE_FILE);
+
+	    if (!file.exists()) {
+	        return;
+	    }
+
+	    try (Scanner scanner = new Scanner(file)) {
+
+	        while (scanner.hasNextLine()) {
+
+	            String line = scanner.nextLine();
+	            String[] data = line.split("\t", -1);
+
+	            if (data.length == 3) {
+
+	                try {
+	                    int id = Integer.parseInt(data[0]);
+	                    String name = data[1];
+	                    String email = data[2];
+
+	                    Attendee attendee =
+	                            new Attendee(id, name, email);
+
+	                    attendees.add(attendee);
+
+	                    nextAttendeeId =
+	                            Math.max(nextAttendeeId, id + 1);
+
+	                } catch (NumberFormatException e) {
+	                    System.out.println("Invalid attendee ID.");
+	                }
+	            }
+	        }
+
+	        System.out.println("Attendees loaded: "
+	                + attendees.size());
+
+	    } catch (IOException e) {
+	        System.out.println("Error loading attendees: "
+	                + e.getMessage());
+	    }
 	}
 
 	public static void main(String[] args) {
