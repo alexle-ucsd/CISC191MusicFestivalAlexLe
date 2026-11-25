@@ -1152,76 +1152,68 @@ public class FestivalGUI extends JFrame {
 		return String.format("%d:%02d %s", hour12, minute, amPm);
 	}
 
-
 	// LO8: Write attendee information to a text file.
 	private boolean saveAttendees(int id, String name, String email) {
 
-	    if (name.contains("\t") || email.contains("\t")
-	            || name.contains("\n") || email.contains("\n")
-	            || name.contains("\r") || email.contains("\r")) {
-	        return false;
-	    }
+		if (name.contains("\t") || email.contains("\t") || name.contains("\n") || email.contains("\n")
+				|| name.contains("\r") || email.contains("\r")) {
+			return false;
+		}
 
-	    try (PrintWriter writer = new PrintWriter(
-	            new FileWriter(ATTENDEE_FILE, true))) {
+		try (PrintWriter writer = new PrintWriter(new FileWriter(ATTENDEE_FILE, true))) {
 
-	        writer.println(id + "\t" + name + "\t" + email);
+			writer.println(id + "\t" + name + "\t" + email);
 
-	        return !writer.checkError();
+			return !writer.checkError();
 
-	    } catch (IOException e) {
+		} catch (IOException e) {
 
-	        System.out.println("Error saving attendees: "
-	                + e.getMessage());
+			System.out.println("Error saving attendees: " + e.getMessage());
 
-	        return false;
-	    }
+			return false;
+		}
 	}
 
 	// LO8: Read attendee information from a text file.
 	private void loadAttendees() {
 
-	    File file = new File(ATTENDEE_FILE);
+		File file = new File(ATTENDEE_FILE);
 
-	    if (!file.exists()) {
-	        return;
-	    }
+		if (!file.exists()) {
+			return;
+		}
 
-	    try (Scanner scanner = new Scanner(file)) {
+		try (Scanner scanner = new Scanner(file)) {
 
-	        while (scanner.hasNextLine()) {
+			while (scanner.hasNextLine()) {
 
-	            String line = scanner.nextLine();
-	            String[] data = line.split("\t", -1);
+				String line = scanner.nextLine();
+				String[] data = line.split("\t", -1);
 
-	            if (data.length == 3) {
+				if (data.length == 3) {
 
-	                try {
-	                    int id = Integer.parseInt(data[0]);
-	                    String name = data[1];
-	                    String email = data[2];
+					try {
+						int id = Integer.parseInt(data[0]);
+						String name = data[1];
+						String email = data[2];
 
-	                    Attendee attendee =
-	                            new Attendee(id, name, email);
+						Attendee attendee = new Attendee(id, name, email);
 
-	                    attendees.add(attendee);
+						attendees.add(attendee);
 
-	                    nextAttendeeId =
-	                            Math.max(nextAttendeeId, id + 1);
+						nextAttendeeId = Math.max(nextAttendeeId, id + 1);
 
-	                } catch (NumberFormatException e) {
-	                    System.out.println("Invalid attendee ID.");
-	                }
-	            }
-	        }
+					} catch (NumberFormatException e) {
+						System.out.println("Invalid attendee ID.");
+					}
+				}
+			}
 
-	        System.out.println("Attendees loaded: "
-	                + attendees.size());
+			System.out.println("Attendees loaded: " + attendees.size());
 
-	    } catch (IOException e) {
-	        System.out.println("Error loading attendees: "
-	                + e.getMessage());
-	    }
+		} catch (IOException e) {
+			System.out.println("Error loading attendees: " + e.getMessage());
+		}
 	}
 
 	public static void main(String[] args) {
